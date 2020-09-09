@@ -45,7 +45,7 @@ public class UsuarioControllerTest {
 
     @WithMockUser
     @Test
-    public void teste01_salvarNovoUsuario() throws Exception {
+    public void teste00_salvarNovoUsuario() throws Exception {
         var map = Map.of("login", "teste-spring", "senha", "123", "nome", "Teste usuario spring");
         var json = mapper.writeValueAsString(map);
         var result = mockMvc.perform(post("/v1-usuarios/novoUsuario")
@@ -53,6 +53,18 @@ public class UsuarioControllerTest {
                 .content(json))
                 .andExpect(status().isCreated()).andReturn();
         assertThat(result.getResponse().getStatus()).isEqualTo(201);
+    }
+
+    @WithMockUser
+    @Test
+    public void teste01_naoPodeSalvarNovoUsuarioDuplicado() throws Exception {
+        var map = Map.of("login", "teste-spring", "senha", "123", "nome", "Teste usuario spring");
+        var json = mapper.writeValueAsString(map);
+        var result = mockMvc.perform(post("/v1-usuarios/novoUsuario")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(json))
+                .andExpect(status().isInternalServerError()).andReturn();
+        assertThat(result.getResponse().getStatus()).isEqualTo(500);
     }
 
     @WithMockUser
@@ -126,5 +138,52 @@ public class UsuarioControllerTest {
         return mapper.readValue(result.getResponse().getContentAsString(), UsuarioDtoSaida.class);
     }
 
+    @WithMockUser
+    @Test
+    public void teste06_naoPodeAtualizarUsuarioErrado() throws Exception {
+        var token = this.getToken();
+        var usuarioAtual = this.buscarUsuario(token);
+        var usuarioAtualizado = new UsuarioDtoEntrada(usuarioAtual.getLogin(), "123", "Teste usuario spring atualizado");
+        var json = mapper.writeValueAsString(usuarioAtualizado);
+        var result = mockMvc.perform(put("/v1-usuarios/user/atualizarUsuario/1")
+                .header("Authorization", token)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(json))
+                .andExpect(status().isBadRequest()).andReturn();
+        assertThat(result.getResponse().getStatus()).isEqualTo(400);
+    }
 
+    @WithMockUser
+    @Test
+    public void teste07_naoPodeExcluirUsuarioErrado()throws Exception {
+        var token = this.getToken();
+        var usuario = this.buscarUsuario(token);
+        var result = mockMvc.perform(delete("/v1-usuarios/user/1")
+                .header("Authorization", token))
+                .andExpect(status().isBadRequest()).andReturn();
+        assertThat(result.getResponse().getStatus()).isEqualTo(400);
+    }
+
+    @WithMockUser
+    @Test
+    public void teste08_excluirUsuario() throws Exception {
+        var token = this.getToken();
+        var usuario = this.buscarUsuario(token);
+        var result = mockMvc.perform(delete("/v1-usuarios/user/" + usuario.getId())
+                .header("Authorization", token))
+                .andExpect(status().isOk()).andReturn();
+        assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    }
+
+    @WithMockUser
+    @Test
+    public void teste09_naoPodeSalvarNovoUsuarioErroNosDados() throws Exception {
+        var map = Map.of("login", "teste-spring", "senha", "123", "nome", "");
+        var json = mapper.writeValueAsString(map);
+        var result = mockMvc.perform(post("/v1-usuarios/novoUsuario")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(json))
+                .andExpect(status().isBadRequest()).andReturn();
+        assertThat(result.getResponse().getStatus()).isEqualTo(400);
+    }
 }

@@ -92,4 +92,11 @@ public class UsuarioRepositoryTest {
                 () -> dao.saveAndFlush(usuario)).getConstraintViolations();
         assertThat(erros.size()).isEqualTo(3);
     }
+
+    @Test
+    public void teste08_excluirUsuario() {
+        var usuario = new Usuario("teste", "123", "Teste para salvar");
+        dao.saveAndFlush(usuario);
+        dao.deleteById(usuario.getId());
+    }
 }

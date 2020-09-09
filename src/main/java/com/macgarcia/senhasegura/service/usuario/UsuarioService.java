@@ -10,14 +10,16 @@ public interface UsuarioService {
     String getMsgErro();
 
     boolean salvarUsuario(UsuarioDtoEntrada dto);
+
     boolean atualizarUsuario(UsuarioDtoEntrada dto, Long id);
+
     boolean excluirUsuario(Long id);
 
-    UsuarioDtoSaida buscarUnico(Long id);
-    Page<UsuarioDtoSaida> buscarUsuarios(Pageable pageable);
-
     boolean validarDados(UsuarioDtoEntrada dto);
+
     boolean verificarExistencia(Long id);
 
     UsuarioDtoSaida buscarUsuraioPorLogin(String login);
+
+    boolean verificarIdentidade(Object user, Long id);
 }

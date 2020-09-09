@@ -4,9 +4,7 @@ import com.macgarcia.senhasegura.dto.in.UsuarioDtoEntrada;
 import com.macgarcia.senhasegura.dto.out.UsuarioDtoSaida;
 import com.macgarcia.senhasegura.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -30,6 +28,10 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Transactional(rollbackOn = Exception.class)
     public boolean salvarUsuario(UsuarioDtoEntrada dto) {
         try {
+            var possivelUsuario = dao.findByLogin(dto.getLogin());
+            if (possivelUsuario != null) {
+                return false;
+            }
             var usuario = dto.criar();
             dao.saveAndFlush(usuario);
             return true;
@@ -63,20 +65,6 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public UsuarioDtoSaida buscarUnico(Long id) {
-        var usuario = dao.findById(id).get();
-        return new UsuarioDtoSaida(usuario);
-    }
-
-    @Override
-    public Page<UsuarioDtoSaida> buscarUsuarios(Pageable pageable) {
-        var usuarios = dao.findAll(pageable);
-        var dadosSaida = usuarios.stream()
-                .map(UsuarioDtoSaida::new).collect(Collectors.toList());
-        return new PageImpl(dadosSaida, pageable, usuarios.getTotalElements());
-    }
-
-    @Override
     public boolean validarDados(UsuarioDtoEntrada dto) {
         var erros = validator.validate(dto);
         if (!erros.isEmpty()) {
@@ -101,6 +89,16 @@ public class UsuarioServiceImpl implements UsuarioService {
             return null;
         }
         return new UsuarioDtoSaida(usuario);
+    }
+
+    @Override
+    public boolean verificarIdentidade(Object user, Long id) {
+        var u = (User) user;
+        var usuario = dao.findByLogin(((User) user).getUsername());
+        if (!(id.equals(usuario.getId()))) {
+            return false;
+        }
+        return true;
     }
 
     @Override
