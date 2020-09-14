@@ -30,7 +30,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class UsuarioControllerTest {
 
     private MockMvc mockMvc;
-    private Long id;
 
     @Autowired
     private ObjectMapper mapper;

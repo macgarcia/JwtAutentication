@@ -96,7 +96,10 @@ public class UsuarioRepositoryTest {
     @Test
     public void teste08_excluirUsuario() {
         var usuario = new Usuario("teste", "123", "Teste para salvar");
-        dao.saveAndFlush(usuario);
-        dao.deleteById(usuario.getId());
+        var usuarioSalvo = dao.saveAndFlush(usuario);
+        var id = usuarioSalvo.getId();
+        dao.deleteById(id);
+        var result = dao.findById(id);
+        assertThat(result).isEmpty();
     }
 }

@@ -96,4 +96,15 @@ public class CredencialRepositoryTest {
         var erro = erros.stream().findFirst();
         assertThat(erro.get().getMessageTemplate()).isEqualTo("Nome da aplicação não pode ser nula.");
     }
+
+    @Test
+    public void teste08_excluirCredencial() {
+        var usuario = this.getUsuraio();
+        var credencial = new Credencial("http://www.teste.com.br", "teste", "111", "teste-delete", usuario);
+        var credencialSalva = dao.saveAndFlush(credencial);
+        var id = credencialSalva.getId();
+        dao.deleteById(id);
+        var result = dao.findById(id);
+        assertThat(result).isEmpty();
+    }
 }

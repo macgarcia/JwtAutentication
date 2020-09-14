@@ -5,6 +5,7 @@ import com.macgarcia.senhasegura.entity.Usuario;
 import org.hibernate.validator.constraints.URL;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.io.Serializable;
 import java.util.function.Function;
@@ -25,7 +26,7 @@ public class CredencialDtoEntrada implements Serializable {
     private String nomeAplicacao;
 
     @Positive(message = "Identificador inválido.")
-    @NotEmpty(message = "Identificador do usuário não pode ser nulo.")
+    @NotNull(message = "Identificador do usuário não pode ser nulo.")
     private Long idUsuario;
 
     public String getUrl() {

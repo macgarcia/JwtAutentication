@@ -21,7 +21,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues())
                 .and().csrf().disable().authorizeRequests()
-                .antMatchers(HttpMethod.POST, SecurityConstants.SING_UP_URL).permitAll()
+                //.antMatchers(HttpMethod.POST, SecurityConstants.SING_UP_URL).permitAll()
                 .antMatchers("/*/user/**").hasRole("USER")
                 .and()
                 .addFilter(new JwtAuthenticationFilter(authenticationManager()))
